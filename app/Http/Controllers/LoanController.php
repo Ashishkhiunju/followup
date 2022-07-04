@@ -18,10 +18,14 @@ class LoanController extends Controller
 
     public function store(Request $request){
         try{
-            $imageName = Str::random().'.'.$request->image->getClientOriginalExtension();
+            $imageName = "";
+            if($request->image){
+                $imageName = Str::random().'.'.$request->image->getClientOriginalExtension();
             
-            Storage::disk('public')->putFileAs('loan', $request->image,$imageName);
-            $imageName = "loan/".$imageName;
+                Storage::disk('public')->putFileAs('loan', $request->image,$imageName);
+                $imageName = "loan/".$imageName;
+            }
+            
             Loan::create($request->post()+['image'=>$imageName]);
 
             return response()->json([

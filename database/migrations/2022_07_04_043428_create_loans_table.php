@@ -28,6 +28,8 @@ class CreateLoansTable extends Migration
             $table->string('loan_purpose')->nullable();
             $table->integer('installation_type')->default(0);
             $table->string('recommend_to')->nullable();
+            $table->string('issue_date')->nullable();
+            $table->string('due_date')->nullable();
             $table->timestamps();
         });
     }
