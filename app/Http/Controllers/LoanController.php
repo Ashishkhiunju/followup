@@ -3,38 +3,71 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Customer;
 use App\Models\Loan;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
-
+use App\Http\Resources\LoanCollection;
+use DB;
 
 class LoanController extends Controller
 {
 
     public function index(){
-        return Loan::select('id','name','loan_amount','image')->get();
+        // return new LoanCollection(Loan::with('customer')->get());
+        return Loan::with('customer')->get();
+        // $loans = Loan::with('customer')->get();
+        // $loans->map(function($data) {
+           
+        //     return [
+        //         'id' => $data->id,
+        //         'name' => $data->customer->name,
+        //         'loan_amount' => $data->loan_amount,
+        //         'image' => $data->customer->image,
+                
+        //     ];
+        // });
     }
 
     public function store(Request $request){
+        $request->validate([
+            'name'=>'required',
+            'email'=>'required',
+            'address'=>'required',
+            'phone'=>'required',
+            'loan_type'=>'required',
+            'loan_amount'=>'required',
+        ]);
+        DB::beginTransaction();
         try{
             $imageName = "";
             if($request->image){
                 $imageName = Str::random().'.'.$request->image->getClientOriginalExtension();
             
-                Storage::disk('public')->putFileAs('loan', $request->image,$imageName);
-                $imageName = "loan/".$imageName;
+                Storage::disk('public')->putFileAs('customer', $request->image,$imageName);
+                $imageName = "customer/".$imageName;
             }
-            
-            Loan::create($request->post()+['image'=>$imageName]);
-
+            $customer = Customer::create([
+                'name'=>$request->name,
+                'address'=>$request->address,
+                'phone'=>$request->phone,
+                'email'=>$request->email,
+                'company_name'=>$request->company_name,
+                'citizen_ship_no'=>$request->citizen_ship_no,
+                'image'=>$imageName
+            ]);
+           
+            Loan::create($request->post()+['customer_id'=>$customer->id]);
+            DB::commit();
             return response()->json([
                 'message'=>'Loan Created Successfully!!'
             ]);
         }catch(\Exception $e){
+            DB::rollback();
             \Log::error($e->getMessage());
             return response()->json([
-                'message'=>'Something goes wrong while creating a product!!'
+                'message'=>$e->getMessage()
             ],500);
         }
     }
