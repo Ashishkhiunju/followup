@@ -23,7 +23,7 @@ class LoanController extends Controller
     public function store(Request $request){
         $request->validate([
             'name'=>'required',
-            'email'=>'required|unique:customers',
+            'email'=>'nullable|unique:customers',
             'address'=>'required',
             'phone'=>'required|unique:customers',
             'loan_type'=>'required',
