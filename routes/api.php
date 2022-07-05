@@ -20,3 +20,4 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 Route::resource('loan',LoanController::class);
 Route::resource('customers',CustomerController::class);
+Route::get('customerloandetail/{id}',[CustomerController::class,'customerLoanDetail']);

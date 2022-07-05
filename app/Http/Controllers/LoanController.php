@@ -17,25 +17,15 @@ class LoanController extends Controller
     public function index(){
         // return new LoanCollection(Loan::with('customer')->get());
         return Loan::with('customer')->get();
-        // $loans = Loan::with('customer')->get();
-        // $loans->map(function($data) {
-           
-        //     return [
-        //         'id' => $data->id,
-        //         'name' => $data->customer->name,
-        //         'loan_amount' => $data->loan_amount,
-        //         'image' => $data->customer->image,
-                
-        //     ];
-        // });
+        
     }
 
     public function store(Request $request){
         $request->validate([
             'name'=>'required',
-            'email'=>'required',
+            'email'=>'required|unique:customers',
             'address'=>'required',
-            'phone'=>'required',
+            'phone'=>'required|unique:customers',
             'loan_type'=>'required',
             'loan_amount'=>'required',
         ]);

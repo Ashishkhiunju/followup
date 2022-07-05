@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Customer;
+use App\Models\Loan;
 
 class CustomerController extends Controller
 {
@@ -25,5 +26,9 @@ class CustomerController extends Controller
     //     'customer'=>$array
     // ]);
         
+    }
+
+    public function customerLoanDetail($id){
+        return Loan::where('customer_id',$id)->get();
     }
 }
