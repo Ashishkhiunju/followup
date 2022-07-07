@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\LoanController;
+use App\Http\Controllers\AuthController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -18,6 +19,16 @@ use App\Http\Controllers\LoanController;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::post('/register',[AuthController::class,'register']); // Singup URL 
+Route::post('/login',[AuthController::class,'login']); // lOGIN url
+// Route::middleware(['auth:sanctum'])->group(function(){
+    Route::post('/logout',[AuthController::class,'logout']);
+// });
+
+
 Route::resource('loan',LoanController::class);
+Route::get('loandetail/{id}',[LoanController::class,'loandetail']);
+Route::post('saveloandetail',[LoanController::class,'saveloandetail']);
 Route::resource('customers',CustomerController::class);
 Route::get('customerloandetail/{id}',[CustomerController::class,'customerLoanDetail']);

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Customer;
 use App\Models\Loan;
+use App\Models\LoanDetail;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
@@ -130,5 +131,19 @@ class LoanController extends Controller
                 'message'=>'Something goes wrong while deleting a product!!'
             ]);
         }
+    }
+
+
+    public function loandetail($id){
+        
+        return Loan::with('customer','loan_details')->where('id',$id)->first();
+        
+    }
+
+    public function saveloandetail(Request $request){
+        LoanDetail::create($request->post());
+        return response()->json([
+            'message'=>'Loan Installment Paid'
+        ]);
     }
 }

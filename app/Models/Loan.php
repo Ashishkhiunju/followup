@@ -15,5 +15,8 @@ class Loan extends Model
     public function customer(){
         return $this->belongsTo(Customer::class);
     }
+    public function loan_details(){
+        return $this->hasMany(LoanDetail::class,'loan_id');
+    }
 }
 
