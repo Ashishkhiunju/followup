@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -27,20 +28,40 @@ class AuthController extends Controller
 
     public function login(Request $request){
         $user = User::where('email',$request->email)->first();
-        if(! $user || ! Hash::check($request->password,$user->password)){
+        $data = $request->validate([
+            'email' => ['required'],
+            'password' => ['required'],
+        ]);
+        if (Auth::attempt($data)) {
+            $token = auth()->user()->createToken('apiToken')->plainTextToken;
+            return response()->json([
+                'status'=>200,
+                'username'=>$user->name,
+                'role'=>$user->role_id,
+                'token'=>$token,
+                'message'=>"Logged In Successfully",
+            ]);
+        }else{
             return response()->json([ 
                 'status'=>401,
                 'message'=>'Invalid Credentials',
             ]);
-        }else{
-            $token = $user->createToken($user->email.'_Token')->plainTextToken;
-            return response()->json([
-                'status'=>200,
-                'username'=>$user->name,
-                'token'=>$token,
-                'message'=>"Logged In Successfully",
-            ]);
         }
+        // if(! $user || ! Hash::check($request->password,$user->password)){
+        //     return response()->json([ 
+        //         'status'=>401,
+        //         'message'=>'Invalid Credentials',
+        //     ]);
+        // }else{
+        //     $token = $user->createToken($user->email.'_Token')->plainTextToken;
+        //     return response()->json([
+        //         'status'=>200,
+        //         'username'=>$user->name,
+        //         'role'=>$user->role_id,
+        //         'token'=>$token,
+        //         'message'=>"Logged In Successfully",
+        //     ]);
+        // }
     }
 
     public function logout(){

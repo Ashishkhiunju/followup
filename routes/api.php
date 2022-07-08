@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\LoanController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -22,13 +23,15 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::post('/register',[AuthController::class,'register']); // Singup URL 
 Route::post('/login',[AuthController::class,'login']); // lOGIN url
-// Route::middleware(['auth:sanctum'])->group(function(){
+Route::middleware(['auth:sanctum'])->group(function(){
     Route::post('/logout',[AuthController::class,'logout']);
-// });
 
 
-Route::resource('loan',LoanController::class);
-Route::get('loandetail/{id}',[LoanController::class,'loandetail']);
-Route::post('saveloandetail',[LoanController::class,'saveloandetail']);
-Route::resource('customers',CustomerController::class);
-Route::get('customerloandetail/{id}',[CustomerController::class,'customerLoanDetail']);
+    Route::resource('user',UserController::class);
+    Route::post('updatepassword/{id}',[UserController::class,'updatepassword']);
+    Route::resource('loan',LoanController::class);
+    Route::get('loandetail/{id}',[LoanController::class,'loandetail']);
+    Route::post('saveloandetail',[LoanController::class,'saveloandetail']);
+    Route::resource('customers',CustomerController::class);
+    Route::get('customerloandetail/{id}',[CustomerController::class,'customerLoanDetail']);
+});

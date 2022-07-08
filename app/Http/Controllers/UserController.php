@@ -6,34 +6,119 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Redirect,Response,File;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use App\Models\User;
  
 class UserController extends Controller
 {
-    function register(Request $req)
-    {
-        $name = $req->input('name');
-        $email = $req->input('email');
-        $password = Hash::make($req->input('password'));
-        DB::table('users')->insert([
-            'name' =>   $name,
-            'email' =>  $email ,
-            'password'=> $password
-          ]);
+
+    public function index(){
+        return User::all()->except(1);
     }
-    function login(Request $req)
-    {
-        $email =  $req->input('email');
-        $password = $req->input('password');
- 
-        $user = DB::table('users')->where('email',$email)->first();
-        if(!Hash::check($password, $user->password))
-        {
-            echo "Not Matched";
+
+    public function store(Request $request){
+        $request->validate([
+            'name'=>'required',
+            'email'=>'nullable|unique:users',
+            'address'=>'required',
+            'phone'=>'required|unique:users',
+            'password'=>'required|min:8',
+            'confirm_password'=>'required|same:password',
+            'role_id'=>'required',
+        ]);
+        DB::beginTransaction();
+        try{
+            $imageName = "";
+            if($request->image){
+                $imageName = Str::random().'.'.$request->image->getClientOriginalExtension();
+            
+                Storage::disk('public')->putFileAs('user', $request->image,$imageName);
+                $imageName = "user/".$imageName;
+            }
+            User::create([
+                'name'=>$request->name,
+                'email'=>$request->email,
+                'password'=>Hash::make($request->password),
+                'address'=>$request->address,
+                'phone'=>$request->phone,
+                'image'=>$imageName,
+                'role_id'=>$request->role_id,
+            ]);
+            DB::commit();
+            return response()->json([
+                'message'=>'Successfully Added'
+            ]);
+        }catch(\Exception $e){
+            DB::rollback();
+            \Log::error($e->getMessage());
+            return response()->json([
+                'message'=>$e->getMessage()
+            ],500);
         }
-        else
-        {
-            //$user = DB::table('users')->where('email',$email)->first();
-           echo $user->email;
+    }
+
+    public function show(User $user){
+        return $user;
+    }
+
+    public function update(Request $request, User $user){
+        $request->validate([
+            'name'=>'required',
+            'email' => 'required|email|unique:users,email,'.$user->id,
+            'address'=>'required',
+            'phone'=>'required|unique:users,phone,'.$user->id,
+            
+            'role_id'=>'required',
+        ]);
+        DB::beginTransaction();
+        try{
+            if($request->hasFile('image')){
+                $imageName = Str::random().'.'.$request->image->getClientOriginalExtension();
+            
+                Storage::disk('public')->putFileAs('user', $request->image,$imageName);
+                $imageName = "user/".$imageName;
+            }
+
+            $user->name=$request->name;
+            $user->email=$request->email;
+            $user->address=$request->address;
+            $user->phone=$request->phone;
+            $user->role_id=$request->role_id;
+            $user->image = $imageName ?? $user->image;
+            $user->save();
+            DB::commit();
+            return response()->json([
+                'message'=>'Successfully Updated'
+            ]);
+
+        }catch(\Exception $e){
+            DB::rollback();
+            \Log::error($e->getMessage());
+            return response()->json([
+                'message'=>$e->getMessage()
+            ],500);
         }
+    }
+
+    public function updatepassword(Request $request,$id){
+        $request->validate([
+            'password'=>'required|min:8',
+            'confirm_password'=>'required|same:password',
+        ]);
+
+        $user = User::find($id);
+        $user->password = Hash::make($request->password);
+        $user->save();
+        return response()->json([
+            'message'=>"Password Changed Successfully"
+        ]);
+    }
+
+    public function destroy($id){
+        $user=User::where('id',$id)->delete();
+        return response()->json([
+            'message'=>"Deleted Successfully"
+        ]);
     }
 }
