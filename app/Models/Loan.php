@@ -8,8 +8,20 @@ use Illuminate\Database\Eloquent\Model;
 class Loan extends Model
 {
     use HasFactory;
-   
-    protected $fillable = ['customer_id','loan_type','loan_amount','loan_duration','loan_purpose','installation_type','recommend_to','issue_date','due_date'];
+
+    protected $fillable = [
+        'customer_id',
+        'loan_type',
+        'loan_amount',
+        'loan_duration',
+        'loan_purpose',
+        'installation_type',
+        'recommend_to',
+        'issue_date_eng',
+        'issue_date_nep',
+        'due_date_eng',
+        'due_date_nep',
+        ];
 
 
     public function customer(){
@@ -17,6 +29,9 @@ class Loan extends Model
     }
     public function loan_details(){
         return $this->hasMany(LoanDetail::class,'loan_id');
+    }
+    public function loan_type(){
+        return $this->belongsTo(LoanType::class,'loan_type');
     }
 }
 

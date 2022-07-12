@@ -13,7 +13,7 @@ class CreateLoansTable extends Migration
      */
     public function up()
     {
-        
+
         Schema::create('loans', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('customer_id');
@@ -21,11 +21,13 @@ class CreateLoansTable extends Migration
             $table->double('loan_amount')->default(0);
             $table->string('loan_duration')->default(0);
             $table->string('loan_purpose')->nullable();
-            $table->integer('installation_type')->default(0);
+            $table->string('installation_type')->nullable();
             $table->string('recommend_to')->nullable();
-            $table->string('issue_date')->nullable();
-            $table->string('due_date')->nullable();
-           
+            $table->string('issue_date_eng')->nullable();
+            $table->string('issue_date_nep')->nullable();
+            $table->string('due_date_eng')->nullable();
+            $table->string('due_date_nep')->nullable();
+
             $table->timestamps();
         });
     }

@@ -74,4 +74,13 @@ class AuthController extends Controller
             'message'=>"Loggged Out Successfully",
         ]);
     }
+
+    public function isAuthenticate(){
+        $auth = auth()->user();
+        if($auth){
+            return "true";
+        }else{
+            return "false";
+        }
+    }
 }

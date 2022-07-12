@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "213131fe58cd0b0089a2ecb4b0ce4e3b",
+    "content-hash": "9687ad6c046b434e46b33d17387f0f20",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -1014,6 +1014,71 @@
                 }
             ],
             "time": "2022-06-20T21:43:11+00:00"
+        },
+        {
+            "name": "krishnahimself/laravel-ad-to-bs-converter",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/krishnahimself/laravel-ad-to-bs-converter.git",
+                "reference": "33ea994084c730e4e21f8f1b3d1d5199da59674e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/krishnahimself/laravel-ad-to-bs-converter/zipball/33ea994084c730e4e21f8f1b3d1d5199da59674e",
+                "reference": "33ea994084c730e4e21f8f1b3d1d5199da59674e",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/contracts": "^8.0",
+                "php": "^7.4|^8.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.16",
+                "orchestra/testbench": "^6.0",
+                "phpunit/phpunit": "^9.3",
+                "vimeo/psalm": "^3.11"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Krishnahimself\\DateConverter\\DateConverterServiceProvider"
+                    ],
+                    "aliases": {
+                        "DateConverter": "Krishnahimself\\DateConverter\\DateConverterFacade"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Krishnahimself\\DateConverter\\": "src",
+                    "Krishnahimself\\DateConverter\\Database\\Factories\\": "database/factories"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Krishna Bhandari",
+                    "email": "krishnabhandariweb@gmail.com",
+                    "homepage": "http://krishna-bhandari.com.np",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Convert English date to Nepali date.",
+            "homepage": "https://github.com/krishnahimself/laravel-ad-to-bs-converter",
+            "keywords": [
+                "krishnahimself",
+                "laravel-ad-to-bs-converter"
+            ],
+            "support": {
+                "issues": "https://github.com/krishnahimself/laravel-ad-to-bs-converter/issues",
+                "source": "https://github.com/krishnahimself/laravel-ad-to-bs-converter/tree/1.0.1"
+            },
+            "time": "2021-10-17T21:33:43+00:00"
         },
         {
             "name": "laravel/framework",
@@ -2685,16 +2750,16 @@
         },
         {
             "name": "psy/psysh",
-            "version": "v0.11.5",
+            "version": "v0.11.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/bobthecow/psysh.git",
-                "reference": "c23686f9c48ca202710dbb967df8385a952a2daf"
+                "reference": "77fc7270031fbc28f9a7bea31385da5c4855cb7a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bobthecow/psysh/zipball/c23686f9c48ca202710dbb967df8385a952a2daf",
-                "reference": "c23686f9c48ca202710dbb967df8385a952a2daf",
+                "url": "https://api.github.com/repos/bobthecow/psysh/zipball/77fc7270031fbc28f9a7bea31385da5c4855cb7a",
+                "reference": "77fc7270031fbc28f9a7bea31385da5c4855cb7a",
                 "shasum": ""
             },
             "require": {
@@ -2755,9 +2820,9 @@
             ],
             "support": {
                 "issues": "https://github.com/bobthecow/psysh/issues",
-                "source": "https://github.com/bobthecow/psysh/tree/v0.11.5"
+                "source": "https://github.com/bobthecow/psysh/tree/v0.11.7"
             },
-            "time": "2022-05-27T18:03:49+00:00"
+            "time": "2022-07-07T13:49:11+00:00"
         },
         {
             "name": "ralouphie/getallheaders",
@@ -2979,6 +3044,51 @@
                 }
             ],
             "time": "2021-09-25T23:10:38+00:00"
+        },
+        {
+            "name": "shankhadev/bsdate",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/shankhadevpadam/laravelbsdate.git",
+                "reference": "f3d922e1c2bcd85d15cc73fa6a10a44649464e01"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/shankhadevpadam/laravelbsdate/zipball/f3d922e1c2bcd85d15cc73fa6a10a44649464e01",
+                "reference": "f3d922e1c2bcd85d15cc73fa6a10a44649464e01",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5.9"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Shankhadev\\Bsdate\\": "src/Bsdate/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Padam Shankhadev",
+                    "email": "shankhadev123@gmail.com"
+                }
+            ],
+            "description": "A simple package that convert AD to BS and viceversa.",
+            "keywords": [
+                "Bikramsambat",
+                "Nepali Date"
+            ],
+            "support": {
+                "issues": "https://github.com/shankhadevpadam/laravelbsdate/issues",
+                "source": "https://github.com/shankhadevpadam/laravelbsdate/tree/master"
+            },
+            "time": "2017-11-08T02:45:31+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -7959,7 +8069,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "shankhadev/bsdate": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
