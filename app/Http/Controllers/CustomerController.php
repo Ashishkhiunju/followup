@@ -23,15 +23,15 @@ class CustomerController extends Controller
     //     $btn = '';
     //     $array[$k]['action'] = $btn;
     //    }
-       
+
     //    return response()->json([
     //     'customer'=>$array
     // ]);
-        
+
     }
 
     public function customerlist(){
-       
+
         $customers = Customer::get();
         $array = [];
         foreach($customers as $k=>$customer){
@@ -53,12 +53,12 @@ class CustomerController extends Controller
             'email'=>'nullable|unique:customers',
             'address'=>'required',
             'phone'=>'required|unique:customers',
-           
+
         ]);
         $imageName ="";
         if($request->image){
             $imageName = Str::random().'.'.$request->image->getClientOriginalExtension();
-        
+
             Storage::disk('public')->putFileAs('customer', $request->image,$imageName);
             $imageName = "customer/".$imageName;
         }

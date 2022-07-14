@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\InstallationController;
 use App\Http\Controllers\LoanController;
 use App\Http\Controllers\LoanTypeController;
 use App\Http\Controllers\AuthController;
@@ -29,14 +31,23 @@ Route::get('authenticate',[AuthController::class,'isAuthenticate']);
 
 Route::middleware(['auth:sanctum'])->group(function(){
     Route::post('/logout',[AuthController::class,'logout']);
-
+    Route::get('/convertdate',[HomeController::class,'convertdate']);
     Route::resource('loan-type',LoanTypeController::class);
+    Route::get('user/list',[UserController::class,'userlist']);
+    Route::get('user-related/loan',[UserController::class,'userAssignedLoanlist']);
+    Route::post('user/transferLoan',[UserController::class,'transferLoan']);
     Route::resource('user',UserController::class);
+
     Route::post('updatepassword/{id}',[UserController::class,'updatepassword']);
     Route::resource('loan',LoanController::class);
     Route::get('loans/todayfollowup',[LoanController::class,'todayfollowup']);
     Route::get('loans/notContacted',[LoanController::class,'notContacted']);
+    Route::post('loan/makeconnected',[LoanController::class,'makeconnected']);
+    Route::get('installationContactForToday',[InstallationController::class,'installationContactForToday']);
+    Route::post('loan/makereminder',[LoanController::class,'makeReminder']);
+    Route::get('loans/reminder',[LoanController::class,'reminder']);
     Route::get('loandetail/{id}',[LoanController::class,'loandetail']);
+    Route::get('view-loan-alldetails/{id}',[LoanController::class,'loanAllDetails']);
     Route::post('saveloandetail',[LoanController::class,'saveloandetail']);
     Route::resource('customers',CustomerController::class);
     Route::get('customer/list',[CustomerController::class,'customerlist']);

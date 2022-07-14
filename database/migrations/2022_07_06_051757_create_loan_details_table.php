@@ -17,6 +17,7 @@ class CreateLoanDetailsTable extends Migration
             $table->increments('id');
             $table->integer('loan_id');
             $table->double('paid_amount')->default(0);
+            $table->string('paid_date')->nullable();
             $table->timestamps();
         });
     }

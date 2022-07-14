@@ -19,6 +19,8 @@ class CreateLoansTable extends Migration
             $table->integer('customer_id');
             $table->integer('loan_type')->default(0);
             $table->double('loan_amount')->default(0);
+            $table->double('paid_amount')->default(0);
+            $table->double('remaining_amount')->default(0);
             $table->string('loan_duration')->default(0);
             $table->string('loan_purpose')->nullable();
             $table->string('installation_type')->nullable();
@@ -27,6 +29,7 @@ class CreateLoansTable extends Migration
             $table->string('issue_date_nep')->nullable();
             $table->string('due_date_eng')->nullable();
             $table->string('due_date_nep')->nullable();
+            $table->integer('user_id')->nullable();
 
             $table->timestamps();
         });

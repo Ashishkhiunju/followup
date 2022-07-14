@@ -13,6 +13,8 @@ class Loan extends Model
         'customer_id',
         'loan_type',
         'loan_amount',
+        'paid_amount',
+        'remaining_amount',
         'loan_duration',
         'loan_purpose',
         'installation_type',
@@ -21,6 +23,7 @@ class Loan extends Model
         'issue_date_nep',
         'due_date_eng',
         'due_date_nep',
+        'user_id',
         ];
 
 
@@ -32,6 +35,12 @@ class Loan extends Model
     }
     public function loan_type(){
         return $this->belongsTo(LoanType::class,'loan_type');
+    }
+    public function loan_contacts(){
+        return $this->hasMany(LoanContact::class,'loan_id');
+    }
+    public function loan_reminders(){
+        return $this->hasMany(LoanReminder::class,'loan_id');
     }
 }
 

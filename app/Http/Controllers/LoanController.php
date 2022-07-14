@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use DB;
+use Auth;
 use Carbon\Carbon;
 use App\Models\Loan;
 use App\Models\Customer;
+use App\Models\LoanContact;
 use App\Models\LoanDetail;
+use App\Models\LoanReminder;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Bsdate;//nepali to english
@@ -23,31 +26,98 @@ class LoanController extends Controller
         // dd(date("Y-m-d"));
         // return new LoanCollection(Loan::with('customer')->get());
 
-        return Loan::with('customer','loan_details')->paginate(10);
+        return Loan::with('customer','loan_details')->where('user_id',Auth::user()->id)->paginate(10);
 
     }
 
     public function todayfollowup(){
         $todaydate = date("Y-m-d");
-        return LoanInstallationDate::with('loan','loan.customer','loan.loan_details')->where('next_installation_eng_date',$todaydate)->paginate(10);
+        return LoanInstallationDate::with('loan','loan.customer','loan.loan_details')->whereHas('loan',function($q){
+            $q->where('user_id',Auth::user()->id);
+        })->where('next_installation_eng_date',$todaydate)->paginate(10);
         // return Loan::with('customer','loan_details')->where('installation_type','daily')->paginate(10);
     }
 
     public function notContacted(){
         $todaydate = date("Y-m-d");
-        $LoanInstallationDate = LoanInstallationDate::with('loan','loan.customer','loan.loan_details')->where('next_installation_eng_date',$todaydate)
-        ->whereNotExists(function($query)
-                {
-                    $query->select(DB::raw(1))
-                          ->from('loans_contacts')
-                          ->whereRaw('loan_installation_dates.loan_id = loans_contacts.loan_id')
-                          ->whereRaw('loan_installation_dates.next_installation_eng_date = loans_contacts.installation_date')
-                          ->whereRaw('loans_contacts.contacted = 1');
-                })
+        // $LoanInstallationDate = LoanInstallationDate::with('loan','loan.customer','loan.loan_details')->whereHas('loan',function($q){
+        //     $q->where('user_id',Auth::user()->id);
+        // })->where('next_installation_eng_date',$todaydate)
+        // ->whereNotExists(function($query)
+        //         {
+        //             $query->select(DB::raw(1))
+        //                   ->from('loans_contacts')
+        //                   ->whereRaw('loan_installation_dates.loan_id = loans_contacts.loan_id')
+        //                   ->whereRaw('loan_installation_dates.next_installation_eng_date = loans_contacts.installation_date')
+        //                   ->whereRaw('loans_contacts.contacted = 1');
+        //         })
 
-        ->paginate(10);
+        // ->paginate(10);
 
+        $LoanInstallationDate = LoanContact::with('loan','loan.customer','loan.loan_details')->whereHas('loan',function($q){
+                $q->where('user_id',Auth::user()->id);
+            })->where('contacted','0')->paginate(10);
      return $LoanInstallationDate;
+    }
+
+    public function makeconnected(Request $request){
+
+        $loancontacts = LoanContact::updateOrCreate(
+                [
+                    'loan_id'=>$request->loan_id,
+                    'installation_date'=>$request->installation_date
+                ],
+                [
+                    'contacted'=>1
+                ]
+            );
+        if($loancontacts){
+            return response()->json([
+                'status'=>'200',
+                'message'=>'Contacted make successfully'
+            ],200);
+        }else{
+            return response()->json([
+                'status'=>'401',
+                'message'=>'Something went wrong'
+            ],401);
+        }
+        return $request->loan_id;
+    }
+
+    public function makeReminder(Request $request){
+        $reminderEngdate = eng_date($request->reminderDate);
+        // return $request->reminderDetail;
+        $loanreminder = LoanReminder::updateOrCreate([
+            'loan_id'=>$request->loan_id,
+            'installation_date'=>$request->installation_date,
+        ],
+        [
+            'reminder_date_eng'=>$reminderEngdate,
+            'reminder_date_nep'=>$request->reminderDate,
+            'reminder_detail'=>$request->reminderDetail,
+        ]);
+        if($loanreminder){
+            return response()->json([
+                'status'=>"200",
+                'message'=>"Reminder Update Successfully",
+            ]);
+        }else{
+            return response()->json([
+                'status'=>"401",
+                'message'=>"Something went Wrong Please try again later",
+            ]);
+        }
+
+
+    }
+
+    public function reminder(){
+        $todaydate = date("Y-m-d");
+
+        return LoanReminder::with('loan','loan.customer','loan.loan_details')->whereHas('loan',function($q){
+            $q->where('user_id',Auth::user()->id);
+        })->whereDate('reminder_date_eng',$todaydate)->paginate(10);
     }
 
     public function store(Request $request){
@@ -97,10 +167,12 @@ class LoanController extends Controller
             $due_date_eng = eng_date($request->due_date);
             $postarray = [
                 'customer_id'=>$customerid,
+                'remaining_amount'=>$request->loan_amount,
                 'issue_date_eng'=>$issue_date_eng,
                 'issue_date_nep'=>$request->issue_date,
                 'due_date_eng'=>$due_date_eng,
                 'due_date_nep'=>$request->due_date,
+                'user_id'=>Auth::user()->id,
             ];
 
             $loan = Loan::create($request->post()+$postarray);
@@ -241,10 +313,46 @@ class LoanController extends Controller
     }
 
     public function saveloandetail(Request $request){
-        LoanDetail::create($request->post());
-        return response()->json([
-            'message'=>'Loan Installment Paid'
-        ]);
+        DB::beginTransaction();
+        try{
+            LoanDetail::create([
+                'loan_id'=>$request->loan_id,
+                'paid_amount'=>$request->paid_amount,
+                'paid_date'=>date("Y-m-d"),
+            ]);
+            $loan = Loan::find($request->loan_id);
+            $loan->decrement('remaining_amount',$request->paid_amount);
+            $loan->increment('paid_amount',$request->paid_amount);
+
+            //update loan installation date
+            $loaninstallationdate = LoanInstallationDate::where('loan_id',$request->loan_id)->first();
+            $this->createLoanInstallationDate($loan->id,$loan->installation_type,$loaninstallationdate->next_installation_eng_date);
+
+            //update loan contact if exist
+            $loancontact = LoanContact::where('loan_id',$request->loan_id)->where('installation_date',$loaninstallationdate->next_installation_eng_date)->first();
+            if($loancontact){
+                $loancontact->update([
+                    'contacted'=>'1',
+                    'paid'=>'1',
+                ]);
+            }
+            DB::commit();
+            return response()->json([
+                'message'=>'Loan Installment Paid'
+            ]);
+        }catch(\Exception $e){
+            DB::rollback();
+            $message = $e->getMessage();
+            return response()->json([
+                'message'=>$message
+            ]);
+        }
+
+    }
+
+    public function loanAllDetails($id){
+        $loandetails = Loan::with('customer','loan_details','loan_type','loan_contacts','loan_reminders')->where('id',$id)->first();
+        return $loandetails;
     }
 
 

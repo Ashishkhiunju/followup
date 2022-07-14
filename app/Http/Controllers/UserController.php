@@ -1,15 +1,16 @@
 <?php
- 
+
 namespace App\Http\Controllers;
- 
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Redirect,Response,File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Models\Loan;
 use App\Models\User;
- 
+
 class UserController extends Controller
 {
 
@@ -32,7 +33,7 @@ class UserController extends Controller
             $imageName = "";
             if($request->image){
                 $imageName = Str::random().'.'.$request->image->getClientOriginalExtension();
-            
+
                 Storage::disk('public')->putFileAs('user', $request->image,$imageName);
                 $imageName = "user/".$imageName;
             }
@@ -68,14 +69,14 @@ class UserController extends Controller
             'email' => 'required|email|unique:users,email,'.$user->id,
             'address'=>'required',
             'phone'=>'required|unique:users,phone,'.$user->id,
-            
+
             'role_id'=>'required',
         ]);
         DB::beginTransaction();
         try{
             if($request->hasFile('image')){
                 $imageName = Str::random().'.'.$request->image->getClientOriginalExtension();
-            
+
                 Storage::disk('public')->putFileAs('user', $request->image,$imageName);
                 $imageName = "user/".$imageName;
             }
@@ -119,6 +120,38 @@ class UserController extends Controller
         $user=User::where('id',$id)->delete();
         return response()->json([
             'message'=>"Deleted Successfully"
+        ]);
+    }
+
+    public function userlist(){
+
+        $users=User::get();
+        $array = [];
+        foreach($users as $k=>$user){
+            $array[$k]['value']=$user->id;
+            $array[$k]['label']=$user->role_id == 1 ? $user->name."(Admin)" : $user->name;
+        }
+        return $array;
+
+    }
+
+    public function userAssignedLoanlist(Request $request){
+        $loans = Loan::with('customer')->where('user_id',$request->user_id)->get();
+        $array = [];
+        foreach($loans as $k=>$loan){
+            $array[$k]['value']=$loan->id;
+            $array[$k]['label']=$loan->customer->name.'('.$loan->loan_purpose.')';
+        }
+        return $array;
+
+    }
+
+    public function transferLoan(Request $request){
+        $loan = Loan::where('id',$request->loan_id)->first();
+        $loan->user_id = $request->transfer_to;
+        $loan->save();
+        return response()->json([
+            'message'=>'Transfer Successfully'
         ]);
     }
 }

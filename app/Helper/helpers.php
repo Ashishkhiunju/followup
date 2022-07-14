@@ -83,4 +83,18 @@ use App\Helper\Nepali_Calendar;
         return eng_to_nep_num_convert($nepdate['year']).'-'.eng_to_nep_num_convert($nepdate['month']).'-'.eng_to_nep_num_convert($nepdate['date']);
     }
 
+    function nep_date_inEng($date){
+        $explodeyear = explode('-',$date);
+        $year = $explodeyear[0];
+        $month = $explodeyear[1];
+        $day = $explodeyear[2];
+        $explodedate = explode(' ',$day);
+        $date = $explodedate[0];
+
+        $cal = new Nepali_Calendar();
+        $nepdate = $cal->eng_to_nep($year,$month,$date);
+
+        return $nepdate['year'].'-'.$nepdate['month'].'-'.$nepdate['date'];
+    }
+
 ?>

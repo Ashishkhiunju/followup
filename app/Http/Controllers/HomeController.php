@@ -24,9 +24,19 @@ class HomeController extends Controller
      */
     public function index()
     {
-      
-      
+
+
         // return view('home');
         return 'success';
+    }
+
+    public function convertdate(Request $request){
+        if($request->convertto == 'nepali'){
+            return [
+                'nep_date_inNepali' => nep_date($request->date),
+                'nep_date_inEnglish' => nep_date_inEng($request->date),
+            ];
+        }
+
     }
 }
