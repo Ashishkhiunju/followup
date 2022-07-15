@@ -22,11 +22,18 @@ use App\Helper\Nepali_Calendar;
 class LoanController extends Controller
 {
 
-    public function index(){
+    public function index(Request $request){
         // dd(date("Y-m-d"));
         // return new LoanCollection(Loan::with('customer')->get());
+        $loan = Loan::with('customer','loan_details');
+        if($request->search){
+            $search = $request->search;
+            $loan = $loan->whereHas('customer',function($q)use($search){
+                $q->where('name',"LIKE","%".$search."%");
+            });
+        }
 
-        return Loan::with('customer','loan_details')->where('user_id',Auth::user()->id)->paginate(10);
+        return $loan->where('user_id',Auth::user()->id)->paginate(10);
 
     }
 
