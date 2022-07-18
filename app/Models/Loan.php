@@ -24,6 +24,8 @@ class Loan extends Model
         'due_date_eng',
         'due_date_nep',
         'user_id',
+        'intrest_rate',
+        'intrest_amount',
         ];
 
 

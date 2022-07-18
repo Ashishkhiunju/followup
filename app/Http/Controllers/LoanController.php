@@ -150,6 +150,7 @@ class LoanController extends Controller
                 'customer_id'=>'required',
                 'loan_type'=>'required',
                 'loan_amount'=>'required',
+                'intrest_rate'=>'required',
             ]);
         }else{
             $request->validate([
@@ -159,6 +160,7 @@ class LoanController extends Controller
                 'phone'=>'required|unique:customers',
                 'loan_type'=>'required',
                 'loan_amount'=>'required',
+                'intrest_rate'=>'required',
             ]);
         }
 
@@ -188,6 +190,8 @@ class LoanController extends Controller
 
             $issue_date_eng = eng_date($request->issue_date);
             $due_date_eng = eng_date($request->due_date);
+
+            // $intrest_amount = $this->calculateIntrestAmount($request->loan_amount,$request->intrest_rate);
             $postarray = [
                 'customer_id'=>$customerid,
                 'remaining_amount'=>$request->loan_amount,
@@ -196,6 +200,8 @@ class LoanController extends Controller
                 'due_date_eng'=>$due_date_eng,
                 'due_date_nep'=>$request->due_date,
                 'user_id'=>Auth::user()->id,
+                'intrest_rate'=>$request->intrest_rate,
+                'intrest_amount'=>"0",
             ];
 
             $loan = Loan::create($request->post()+$postarray);
@@ -246,6 +252,11 @@ class LoanController extends Controller
         $installationDates->next_installation_nep_date = $nextInstallationNepDate;
         $installationDates->save();
 
+    }
+
+    public function calculateIntrestAmount($loanamount,$intrestAmount){
+        $amount = ($intrestAmount * $loanamount) / (100*365);
+        return $amount;
     }
 
     public function show($id)
