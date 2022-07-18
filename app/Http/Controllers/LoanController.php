@@ -23,17 +23,23 @@ class LoanController extends Controller
 {
 
     public function index(Request $request){
+
         // dd(date("Y-m-d"));
         // return new LoanCollection(Loan::with('customer')->get());
-        $loan = Loan::with('customer','loan_details');
+        $loan = Loan::with('customer','loan_details')->where('user_id',Auth::user()->id);
         if($request->search){
             $search = $request->search;
             $loan = $loan->whereHas('customer',function($q)use($search){
-                $q->where('name',"LIKE","%".$search."%");
-            });
-        }
+                $q->where('name',"LIKE","%".$search."%")
+                  ->orWhere('phone',"LIKE","%".$search."%");
 
-        return $loan->where('user_id',Auth::user()->id)->paginate(10);
+            });
+            // $loan = $loan->where('loan_amount',"LIKE","%".$search."%");
+
+        }
+        $filter = $request->filter;
+
+        return $loan->orderBy('id',$filter)->paginate(10);
 
     }
 
@@ -45,7 +51,7 @@ class LoanController extends Controller
         // return Loan::with('customer','loan_details')->where('installation_type','daily')->paginate(10);
     }
 
-    public function notContacted(){
+    public function notContacted(Request $request){
         $todaydate = date("Y-m-d");
         // $LoanInstallationDate = LoanInstallationDate::with('loan','loan.customer','loan.loan_details')->whereHas('loan',function($q){
         //     $q->where('user_id',Auth::user()->id);
@@ -61,10 +67,20 @@ class LoanController extends Controller
 
         // ->paginate(10);
 
-        $LoanInstallationDate = LoanContact::with('loan','loan.customer','loan.loan_details')->whereHas('loan',function($q){
+        $query = LoanContact::with('loan','loan.customer','loan.loan_details')->whereHas('loan',function($q){
                 $q->where('user_id',Auth::user()->id);
-            })->where('contacted','0')->paginate(10);
-     return $LoanInstallationDate;
+            })->where('contacted','0');
+
+        if($request->search){
+            $search = $request->search;
+            $query = $query->whereHas('loan.customer',function($q)use($search){
+                $q->where('name',"LIKE","%".$search."%")
+                  ->orWhere('phone',"LIKE","%".$search."%");
+            });
+
+        }
+        $query = $query->orderBy('id',$request->filter)->paginate(10);
+     return $query;
     }
 
     public function makeconnected(Request $request){
@@ -358,7 +374,14 @@ class LoanController extends Controller
     }
 
     public function loanAllDetails($id){
+
         $loandetails = Loan::with('customer','loan_details','loan_type','loan_contacts','loan_reminders')->where('id',$id)->first();
+        if(Auth::user()->id != $loandetails->user_id){
+            return response()->json([
+                'status'=>"401",
+                'message'=>"You Dont have Access For this user",
+            ]);
+        }
         return $loandetails;
     }
 
