@@ -30,7 +30,7 @@ class CreateLoansTable extends Migration
             $table->string('due_date_eng')->nullable();
             $table->string('due_date_nep')->nullable();
             $table->integer('user_id')->nullable();
-            $table->integer('intrest_rate')->default(0);
+            $table->float('intrest_rate')->default(0);
             $table->double('intrest_amount')->default(0);
 
             $table->timestamps();

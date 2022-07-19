@@ -9,6 +9,7 @@ use App\Models\Loan;
 use App\Models\Customer;
 use App\Models\LoanContact;
 use App\Models\LoanDetail;
+use App\Models\LoanImage;
 use App\Models\LoanReminder;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -144,7 +145,7 @@ class LoanController extends Controller
     }
 
     public function store(Request $request){
-
+// return gettype($request->multiple_files);
         if($request->has('customer_id')){
             $request->validate([
                 'customer_id'=>'required',
@@ -205,6 +206,22 @@ class LoanController extends Controller
             ];
 
             $loan = Loan::create($request->post()+$postarray);
+
+            if(!empty($request->multiple_files)){
+                foreach($request->multiple_files as $files ){
+
+                    $imageName = Str::random().'.'.$files->getClientOriginalExtension();
+
+                    Storage::disk('public')->putFileAs('files', $files,$imageName);
+                    $imageName = "files/".$imageName;
+                    LoanImage::create([
+                        'loan_id'=>$loan->id,
+                        'image'=>$imageName,
+                    ]);
+                }
+
+
+            }
             $this->createLoanInstallationDate($loan->id,$loan->installation_type,$loan->issue_date_eng);
 
             DB::commit();
@@ -386,7 +403,7 @@ class LoanController extends Controller
 
     public function loanAllDetails($id){
 
-        $loandetails = Loan::with('customer','loan_details','loan_type','loan_contacts','loan_reminders')->where('id',$id)->first();
+        $loandetails = Loan::with('customer','loan_details','loan_type','loan_contacts','loan_reminders','loan_images')->where('id',$id)->first();
         if(Auth::user()->id != $loandetails->user_id){
             return response()->json([
                 'status'=>"401",

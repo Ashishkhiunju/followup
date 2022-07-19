@@ -44,5 +44,9 @@ class Loan extends Model
     public function loan_reminders(){
         return $this->hasMany(LoanReminder::class,'loan_id');
     }
+
+    public function loan_images(){
+        return $this->hasMany(LoanImage::class,'loan_id');
+    }
 }
 
