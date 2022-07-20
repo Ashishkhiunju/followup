@@ -9,6 +9,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\IntrestController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\LoanTypeController;
+use App\Http\Controllers\SavingController;
 use App\Http\Controllers\InstallationController;
 /*
 |--------------------------------------------------------------------------
@@ -55,4 +56,7 @@ Route::middleware(['auth:sanctum'])->group(function(){
     Route::resource('customers',CustomerController::class);
     Route::get('customer/list',[CustomerController::class,'customerlist']);
     Route::get('customerloandetail/{id}',[CustomerController::class,'customerLoanDetail']);
+
+    //Saving
+    Route::resource('saving',SavingController::class);
 });
