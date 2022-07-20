@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Hash;
 class AuthController extends Controller
 {
     public function register(Request $request){
-       
+
         $user = User::create([
             'name'=>$request->name,
             'email'=>$request->email,
@@ -40,17 +40,18 @@ class AuthController extends Controller
                 'status'=>200,
                 'username'=>$user->name,
                 'role'=>$user->role_id,
+                'image'=>$user->image,
                 'token'=>$token,
                 'message'=>"Logged In Successfully",
             ]);
         }else{
-            return response()->json([ 
+            return response()->json([
                 'status'=>401,
                 'message'=>'Invalid Credentials',
             ]);
         }
         // if(! $user || ! Hash::check($request->password,$user->password)){
-        //     return response()->json([ 
+        //     return response()->json([
         //         'status'=>401,
         //         'message'=>'Invalid Credentials',
         //     ]);
@@ -67,7 +68,7 @@ class AuthController extends Controller
     }
 
     public function logout(){
-        
+
         auth()->user()->tokens()->delete();
         return response()->json([
             'status'=>200,

@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\Loan;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Auth;
 
 class CustomerController extends Controller
 {
@@ -69,6 +70,6 @@ class CustomerController extends Controller
     }
 
     public function customerLoanDetail($id){
-        return Loan::with('loan_type')->where('customer_id',$id)->get();
+        return Loan::with('loan_type')->where('customer_id',$id)->where('user_id',Auth::user()->id)->get();
     }
 }

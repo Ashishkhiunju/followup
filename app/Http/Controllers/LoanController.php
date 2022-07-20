@@ -359,7 +359,7 @@ class LoanController extends Controller
 
     public function loandetail($id){
 
-        return Loan::with('customer','loan_details')->where('id',$id)->first();
+        return Loan::with('customer','loan_details')->where('user_id',Auth::user()->id)->where('id',$id)->first();
 
     }
 
