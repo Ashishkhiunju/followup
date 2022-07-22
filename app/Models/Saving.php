@@ -18,4 +18,15 @@ class Saving extends Model
         'intrest_rate',
         'intrest_amount',
     ];
+
+    public function customer(){
+        return $this->belongsTo(Customer::class,'customer_id');
+    }
+
+    public function saving_details(){
+        return $this->hasMany(SavingDetail::class,'saving_id');
+    }
+    public function saving_withdraws(){
+        return $this->hasMany(SavingWithdraw::class,'saving_id');
+    }
 }

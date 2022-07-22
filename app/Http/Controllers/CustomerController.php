@@ -8,9 +8,14 @@ use App\Models\Loan;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Auth;
+use App\Http\Resources\CustomerResource;
 
 class CustomerController extends Controller
 {
+    public const PER_PAGE           = 10;
+    public const DEFAULT_SORT_FIELD = 'created_at';
+    public const DEFAULT_SORT_ORDER = 'asc';
+
     public function index(){
        return Customer::all();
     //    $array = array();
@@ -33,11 +38,11 @@ class CustomerController extends Controller
 
     public function customerlist(){
 
-        $customers = Customer::get();
+        $customers = Customer::select('id','name','phone')->get();
         $array = [];
         foreach($customers as $k=>$customer){
             $array[$k]['value']=$customer->id;
-            $array[$k]['label']=$customer->name;
+            $array[$k]['label']=$customer->name.'/'.$customer->phone;
         }
         return $array;
         // $customers->map(function($data){
@@ -57,7 +62,7 @@ class CustomerController extends Controller
 
         ]);
         $imageName ="";
-        if($request->image){
+        if($request->hasFile('image')){
             $imageName = Str::random().'.'.$request->image->getClientOriginalExtension();
 
             Storage::disk('public')->putFileAs('customer', $request->image,$imageName);
@@ -71,5 +76,25 @@ class CustomerController extends Controller
 
     public function customerLoanDetail($id){
         return Loan::with('loan_type')->where('customer_id',$id)->where('user_id',Auth::user()->id)->get();
+    }
+
+    public function allcustomers(Request $request){
+        $sortFields = ['name', 'address', 'email','citizen_ship_no','company_name','phone'];
+        $sortFieldInput = $request->input('sort_field', self::DEFAULT_SORT_FIELD);
+        $sortField      = in_array($sortFieldInput, $sortFields) ? $sortFieldInput : self::DEFAULT_SORT_FIELD;
+        $sortOrder      = $request->input('sort_order', self::DEFAULT_SORT_ORDER);
+        $searchInput    = $request->input('search');
+        $query          = Customer::orderBy("created_at", 'desc');
+        $perPage        = $request->input('per_page') ?? self::PER_PAGE;
+        if (!is_null($searchInput)) {
+            $searchQuery = "%$searchInput%";
+            $query       = $query->where('name', 'like', $searchQuery)->orWhere('email', 'like', $searchQuery)->orWhere(
+                'address',
+                'like',
+                $searchQuery
+            );
+        }
+        $customers = $query->paginate((int)$perPage);
+    return CustomerResource::collection($customers);
     }
 }

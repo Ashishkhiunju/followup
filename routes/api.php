@@ -39,6 +39,7 @@ Route::middleware(['auth:sanctum'])->group(function(){
     Route::get('user-related/loan',[UserController::class,'userAssignedLoanlist']);
     Route::post('user/transferLoan',[UserController::class,'transferLoan']);
     Route::resource('user',UserController::class);
+    Route::get('allusers',[UserController::class,'allusers']);
 
     Route::post('updatepassword/{id}',[UserController::class,'updatepassword']);
     Route::resource('loan',LoanController::class);
@@ -55,8 +56,11 @@ Route::middleware(['auth:sanctum'])->group(function(){
     Route::post('saveloandetail',[LoanController::class,'saveloandetail']);
     Route::resource('customers',CustomerController::class);
     Route::get('customer/list',[CustomerController::class,'customerlist']);
+    Route::get('allcustomers',[CustomerController::class,'allcustomers']);
     Route::get('customerloandetail/{id}',[CustomerController::class,'customerLoanDetail']);
 
     //Saving
     Route::resource('saving',SavingController::class);
+    Route::post('create-saving-detail',[SavingController::class,'createSavingDetail']);
+    Route::post('create-withdraw-detail',[SavingController::class,'createWithdrawDetail']);
 });

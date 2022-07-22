@@ -5,10 +5,22 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\LoanIntrest;
 use App\Models\Loan;
+use App\Models\Customer;
 
 class IntrestController extends Controller
 {
     public function loanintrest(){
+        // $count=3000;
+        // for($i=0;$i<$count;$i++){
+        //     Customer::create([
+        //         'name'=>'Ashish',
+        //         'email'=>'Ashish@gmail.com',
+        //         'address'=>'Ashi',
+        //         'phone'=>'1234567',
+        //         'citizen_ship_no'=>'1232',
+        //     ]);
+        // }
+
         $todaysdate = date('Y-m-d');
         $todayloanIntrest = loanIntrest::whereDate('date',date('Y-m-d'))->first();
         if(empty($todayloanIntrest)){
