@@ -32,6 +32,7 @@ class CreateLoansTable extends Migration
             $table->integer('user_id')->nullable();
             $table->float('intrest_rate')->default(0);
             $table->double('intrest_amount')->default(0);
+            $table->integer('recommender_id')->nullable();
 
             $table->timestamps();
         });

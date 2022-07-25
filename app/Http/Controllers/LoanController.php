@@ -247,7 +247,7 @@ class LoanController extends Controller
         if($installation_type == "daily"){
             $nextInstallationEngDate = $startdate->addDays(1);
         }
-        if($installation_type == 'weekely'){
+        if($installation_type == 'weekly'){
             $nextInstallationEngDate = $startdate->addDays(7);
         }
         if($installation_type == 'monthly'){
@@ -278,7 +278,7 @@ class LoanController extends Controller
 
     public function show($id)
     {
-        $loan = Loan::with('customer')->where('id',$id)->first();
+        $loan = Loan::with('customer','recommender','loan_images')->where('id',$id)->first();
         return response()->json([
             'loan'=>$loan
         ]);
@@ -288,7 +288,8 @@ class LoanController extends Controller
 
 
     public function update(Request $request, Loan $loan){
-        // try{
+        DB::beginTransaction();
+        try{
             $issue_date_eng = eng_date($request->issue_date);
             $due_date_eng = eng_date($request->due_date);
             $postarray = [
@@ -317,18 +318,36 @@ class LoanController extends Controller
                 $imageName = 'loan/'.$imageName;
                 $loan->image = $imageName;
                 $loan->save();
+
             }
 
+            if(!empty($request->multiple_files)){
+                foreach($request->multiple_files as $files ){
+
+                    $imageName = Str::random().'.'.$files->getClientOriginalExtension();
+
+                    Storage::disk('public')->putFileAs('files', $files,$imageName);
+                    $imageName = "files/".$imageName;
+                    LoanImage::create([
+                        'loan_id'=>$loan->id,
+                        'image'=>$imageName,
+                    ]);
+                }
+
+
+            }
+            DB::commit();
             return response()->json([
                 'message'=>'Loan Updated Successfully!!'
             ]);
 
-        // }catch(\Exception $e){
-        //     \Log::error($e->getMessage());
-        //     return response()->json([
-        //         'message'=>'Something goes wrong while updating a product!!'
-        //     ],500);
-        // }
+        }catch(\Exception $e){
+            DB::rollback();
+            \Log::error($e->getMessage());
+            return response()->json([
+                'message'=>'Something goes wrong while updating a product!!'
+            ],500);
+        }
     }
 
 
@@ -411,6 +430,14 @@ class LoanController extends Controller
             ]);
         }
         return $loandetails;
+    }
+    public function deleteLoanImage(Request $request){
+        $image = LoanImage::find($request->image_id);
+        $image->delete();
+        return response()->json([
+            'message'=>"Deleted Image SuccessFully"
+        ]);
+
     }
 
 

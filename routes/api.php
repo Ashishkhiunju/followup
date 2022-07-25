@@ -6,10 +6,11 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoanController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\SavingController;
 use App\Http\Controllers\IntrestController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\LoanTypeController;
-use App\Http\Controllers\SavingController;
+use App\Http\Controllers\RecommenderController;
 use App\Http\Controllers\InstallationController;
 /*
 |--------------------------------------------------------------------------
@@ -50,6 +51,7 @@ Route::middleware(['auth:sanctum'])->group(function(){
     Route::post('loan/makereminder',[LoanController::class,'makeReminder']);
     Route::get('loans/reminder',[LoanController::class,'reminder']);
     Route::get('loandetail/{id}',[LoanController::class,'loandetail']);
+    Route::post('delete-loan-image',[LoanController::class,'deleteLoanImage']);
     //intrest
     Route::post('loanintrest',[IntrestController::class,'loanintrest']);
     Route::get('view-loan-alldetails/{id}',[LoanController::class,'loanAllDetails']);
@@ -63,4 +65,9 @@ Route::middleware(['auth:sanctum'])->group(function(){
     Route::resource('saving',SavingController::class);
     Route::post('create-saving-detail',[SavingController::class,'createSavingDetail']);
     Route::post('create-withdraw-detail',[SavingController::class,'createWithdrawDetail']);
+
+    Route::resource('recommender',RecommenderController::class);
+    Route::get('allrecommenders',[RecommenderController::class,'index']);
+    Route::get('recommender-list',[RecommenderController::class,'list']);
+
 });

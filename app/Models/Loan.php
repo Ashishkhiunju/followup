@@ -26,6 +26,7 @@ class Loan extends Model
         'user_id',
         'intrest_rate',
         'intrest_amount',
+        'recommender_id'
         ];
 
 
@@ -47,6 +48,10 @@ class Loan extends Model
 
     public function loan_images(){
         return $this->hasMany(LoanImage::class,'loan_id');
+    }
+
+    public function recommender(){
+        return $this->belongsTo(Recommender::class,'recommender_id');
     }
 }
 
