@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Auth;
 use App\Http\Resources\CustomerResource;
+use App\Http\Resources\CustomerLoanDetailResource;
 
 class CustomerController extends Controller
 {
@@ -74,8 +75,21 @@ class CustomerController extends Controller
         ]);
     }
 
-    public function customerLoanDetail($id){
-        return Loan::with('loan_type')->where('customer_id',$id)->where('user_id',Auth::user()->id)->get();
+    public function customerLoanDetail(Request $request, $id){
+        // return Loan::with('loan_type')->where('customer_id',$id)->where('user_id',Auth::user()->id)->get();
+        $sortFields = ['name', 'address', 'email','citizen_ship_no','company_name','phone'];
+        $sortFieldInput = $request->input('sort_field', self::DEFAULT_SORT_FIELD);
+        $sortField      = in_array($sortFieldInput, $sortFields) ? $sortFieldInput : self::DEFAULT_SORT_FIELD;
+        $sortOrder      = $request->input('sort_order', self::DEFAULT_SORT_ORDER);
+        $searchInput    = $request->input('search');
+        $query          = Loan::with('loan_type')->where('customer_id',$id)->where('user_id',Auth::user()->id)->orderBy("created_at", 'desc');
+        $perPage        = $request->input('per_page') ?? self::PER_PAGE;
+        if (!is_null($searchInput)) {
+            $searchQuery = "%$searchInput%";
+            $query       = $query->where('loan_amount', 'like', $searchQuery);
+        }
+        $customers = $query->paginate((int)$perPage);
+    return CustomerLoanDetailResource::collection($customers);
     }
 
     public function allcustomers(Request $request){
