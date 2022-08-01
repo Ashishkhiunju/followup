@@ -11,12 +11,33 @@ use App\Models\SavingWithdraw;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-
+use App\Http\Resources\SavingResource;
 
 class SavingController extends Controller
 {
+    public const PER_PAGE           = 10;
+    public const DEFAULT_SORT_FIELD = 'created_at';
+    public const DEFAULT_SORT_ORDER = 'asc';
+
+    public function allSavings(Request $request){
+        $sortFields = ['saving_type', 'saving_amount'];
+        $sortFieldInput = $request->input('sort_field', self::DEFAULT_SORT_FIELD);
+        $sortField      = in_array($sortFieldInput, $sortFields) ? $sortFieldInput : self::DEFAULT_SORT_FIELD;
+        $sortOrder      = $request->input('sort_order', self::DEFAULT_SORT_ORDER);
+        $searchInput    = $request->input('search');
+        $query          = Saving::with('customer')->orderBy("created_at", 'desc');
+        $perPage        = $request->input('per_page') ?? self::PER_PAGE;
+        if (!is_null($searchInput)) {
+            $searchQuery = "%$searchInput%";
+            $query       = $query->where('saving_type', 'like', $searchQuery);
+        }
+        $datas = $query->paginate((int)$perPage);
+        return SavingResource::collection($datas);
+    }
+
 
     public function index(){
+
         return Saving::with('customer')->latest()->get();
     }
 

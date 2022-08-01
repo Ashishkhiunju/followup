@@ -29,7 +29,7 @@ use App\Http\Controllers\InstallationController;
 
 Route::post('/register',[AuthController::class,'register']); // Singup URL
 Route::post('/login',[AuthController::class,'login']); // lOGIN url
-
+Route::get('allusers',[UserController::class,'allusers']);
 
 // Route::get('loan',[LoanController::class,'index']);
 
@@ -65,7 +65,9 @@ Route::middleware(['auth:sanctum'])->group(function(){
     Route::get('customerloandetail/{id}',[CustomerController::class,'customerLoanDetail']);
 
     //Saving
+    Route::get('all-saving',[SavingController::class,'allSavings']);
     Route::resource('saving',SavingController::class);
+
     Route::post('create-saving-detail',[SavingController::class,'createSavingDetail']);
     Route::post('create-withdraw-detail',[SavingController::class,'createWithdrawDetail']);
 
