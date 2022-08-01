@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Customer;
+use App\Models\LoanInstallationDate;
+use App\Models\LoanContact;
+use App\Models\Saving;
+
 
 class HomeController extends Controller
 {
@@ -38,5 +42,15 @@ class HomeController extends Controller
             ];
         }
 
+    }
+
+    public function dashboardDatas(){
+        $data = [];
+        $data['loan_installation_today'] = LoanInstallationDate::whereDate('next_installation_eng_date',date('Y-m-d'))->count();
+        $data['loan_contacts_today'] = LoanContact::whereDate('installation_date',date('Y-m-d'))->count();
+        $data['not_contacts_today'] = LoanContact::whereDate('installation_date',date('Y-m-d'))->where('contacted',0)->count();
+        $data['saving_today'] = Saving ::whereDate('issue_date_eng',date('Y-m-d'))->sum('saving_amount');
+
+        return $data;
     }
 }

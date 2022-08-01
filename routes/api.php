@@ -23,16 +23,19 @@ use App\Http\Controllers\InstallationController;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Route::middleware('auth:api')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
 
 Route::post('/register',[AuthController::class,'register']); // Singup URL
 Route::post('/login',[AuthController::class,'login']); // lOGIN url
-Route::get('authenticate',[AuthController::class,'isAuthenticate']);
+
+
 // Route::get('loan',[LoanController::class,'index']);
 
 Route::middleware(['auth:sanctum'])->group(function(){
+    Route::get('authenticate',[AuthController::class,'isAuthenticate']);
+    Route::get('dashboard-datas',[HomeController::class,'dashboardDatas']);
     Route::post('/logout',[AuthController::class,'logout']);
     Route::get('/convertdate',[HomeController::class,'convertdate']);
     Route::resource('loan-type',LoanTypeController::class);
