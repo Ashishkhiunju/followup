@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Redirect,Response,File;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use App\Models\Loan;
 use App\Models\User;
+use App\Models\Saving;
+use Illuminate\Support\Str;
+use Redirect,Response,File;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Http\Resources\UserResource;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -24,8 +25,25 @@ class UserController extends Controller
         $this->user = $user;
     }
 
-    public function index(){
-        return User::all()->except(1);
+    public function index(Request $request){
+        // return User::all()->except(1);
+        $sortFields = ['name', 'address', 'email','citizen_ship_no','company_name','phone'];
+        $sortFieldInput = $request->input('sort_field', self::DEFAULT_SORT_FIELD);
+        $sortField      = in_array($sortFieldInput, $sortFields) ? $sortFieldInput : self::DEFAULT_SORT_FIELD;
+        $sortOrder      = $request->input('sort_order', self::DEFAULT_SORT_ORDER);
+        $searchInput    = $request->input('search');
+        $query          = $this->user->orderBy($sortField, $sortOrder);
+        $perPage        = $request->input('per_page') ?? self::PER_PAGE;
+        if (!is_null($searchInput)) {
+            $searchQuery = "%$searchInput%";
+            $query       = $query->where('name', 'like', $searchQuery)->orWhere('email', 'like', $searchQuery)->orWhere(
+                'address',
+                'like',
+                $searchQuery
+            );
+        }
+        $users = $query->paginate((int)$perPage);
+    return UserResource::collection($users);
     }
 
     public function store(Request $request){
@@ -127,6 +145,14 @@ class UserController extends Controller
     }
 
     public function destroy($id){
+        $loan = Loan::where('user_id',$id)->count();
+        $saving = Saving::where('user_id',$id)->count();
+        if($loan > 0 || $saving > 0){
+            return response()->json([
+                'icon'=>"error",
+                'message'=>"User Had already assigned Loan or Saving , So cannot delete"
+            ]);
+        }
         $user=User::where('id',$id)->delete();
         return response()->json([
             'message'=>"Deleted Successfully"

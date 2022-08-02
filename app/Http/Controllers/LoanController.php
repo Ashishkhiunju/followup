@@ -396,6 +396,7 @@ class LoanController extends Controller
 
             //update loan installation date
             $loaninstallationdate = LoanInstallationDate::where('loan_id',$request->loan_id)->first();
+
             $this->createLoanInstallationDate($loan->id,$loan->installation_type,$loaninstallationdate->next_installation_eng_date);
 
             //update loan contact if exist
