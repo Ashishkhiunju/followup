@@ -42,6 +42,7 @@ class AuthController extends Controller
                 'role'=>$user->role_id,
                 'image'=>$user->image,
                 'token'=>$token,
+                'user_id'=>$user->id,
                 'message'=>"Logged In Successfully",
             ]);
         }else{
@@ -78,10 +79,11 @@ class AuthController extends Controller
 
     public function isAuthenticate(){
         $auth = auth()->user();
-        if($auth){
-            return "true";
-        }else{
-            return "false";
-        }
+        return $auth;
+        // if($auth){
+        //     return "true";
+        // }else{
+        //     return "false";
+        // }
     }
 }

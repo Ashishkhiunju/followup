@@ -7,6 +7,9 @@ use App\Models\Customer;
 use App\Models\LoanInstallationDate;
 use App\Models\LoanContact;
 use App\Models\Saving;
+use DateTime;
+use Mail;
+
 
 
 class HomeController extends Controller
@@ -28,10 +31,25 @@ class HomeController extends Controller
      */
     public function index()
     {
+        // $data['to']='sunitabagale95@gmail.com';
+        //     Mail::raw('Hi sunita Maam', function ($message) use($data) {
+        //         $message->to($data['to'])
+        //         ->subject('Registration Otp');
+        //     });
 
+        //     return;
+        $datetime1 = new DateTime('2022-8-3');
+        $datetime2 = new DateTime('2022-08-6');
+        $interval = $datetime1->diff($datetime2);
+        dd($interval->d .' days');
+
+        $todaydate = date('Y-m-d');
+       $dateafterWeek =  date("Y-m-d", strtotime('+7 days' , strtotime($todaydate)));
+        $data = LoanInstallationDate::whereBetween('next_installation_eng_date',[$todaydate,$dateafterWeek])->get();
+        dd($data);
 
         // return view('home');
-        return 'success';
+        // return 'success';
     }
 
     public function convertdate(Request $request){

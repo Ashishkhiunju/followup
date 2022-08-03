@@ -42,8 +42,10 @@ Route::middleware(['auth:sanctum'])->group(function(){
     Route::get('user/list',[UserController::class,'userlist']);
     Route::get('user-related/loan',[UserController::class,'userAssignedLoanlist']);
     Route::post('user/transferLoan',[UserController::class,'transferLoan']);
+    Route::get('users-loan/{id}',[UserController::class,'userLoan']);
     Route::resource('user',UserController::class);
     Route::get('allusers',[UserController::class,'allusers']);
+
 
     Route::post('updatepassword/{id}',[UserController::class,'updatepassword']);
     Route::resource('loan',LoanController::class);

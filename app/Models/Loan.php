@@ -33,6 +33,9 @@ class Loan extends Model
     public function customer(){
         return $this->belongsTo(Customer::class);
     }
+    public function user(){
+        return $this->belongsTo(User::class);
+    }
     public function loan_details(){
         return $this->hasMany(LoanDetail::class,'loan_id');
     }
@@ -53,5 +56,7 @@ class Loan extends Model
     public function recommender(){
         return $this->belongsTo(Recommender::class,'recommender_id');
     }
+
+
 }
 

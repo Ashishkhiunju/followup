@@ -28,7 +28,7 @@ class LoanController extends Controller
         // dd(date("Y-m-d"));
         // return new LoanCollection(Loan::with('customer')->get());
         $loan = Loan::with('customer','loan_details')->where('user_id',Auth::user()->id);
-        if($request->search){
+        if(strlen($request->search) > 1){
             $search = $request->search;
             $loan = $loan->whereHas('customer',function($q)use($search){
                 $q->where('name',"LIKE","%".$search."%")

@@ -10,6 +10,7 @@ use Redirect,Response,File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\UserResource;
+use App\Http\Resources\UserLoanResource;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
@@ -42,7 +43,7 @@ class UserController extends Controller
                 $searchQuery
             );
         }
-        $users = $query->paginate((int)$perPage);
+        $users = $query->where('id','!=',1)->paginate((int)$perPage);
     return UserResource::collection($users);
     }
 
@@ -87,8 +88,10 @@ class UserController extends Controller
         }
     }
 
-    public function show(User $user){
-        return $user;
+    public function show($id){
+
+        return User::where('id',$id)->first();
+
     }
 
     public function update(Request $request, User $user){
@@ -210,5 +213,24 @@ class UserController extends Controller
         }
         $users = $query->paginate((int)$perPage);
     return UserResource::collection($users);
+    }
+
+    public function userLoan(Request $request,$id){
+        $sortFields = [ 'installation_type', 'loan_amount'];
+        $sortFieldInput = $request->input('sort_field', self::DEFAULT_SORT_FIELD);
+        $sortField      = in_array($sortFieldInput, $sortFields) ? $sortFieldInput : self::DEFAULT_SORT_FIELD;
+        $sortOrder      = $request->input('sort_order', self::DEFAULT_SORT_ORDER);
+        $searchInput    = $request->input('search');
+        $query          = Loan::with('customer')->where('user_id',$id)->orderBy($sortField, $sortOrder);
+        $perPage        = $request->input('per_page') ?? self::PER_PAGE;
+        if (!is_null($searchInput)) {
+            $searchQuery = "%$searchInput%";
+
+            $query       = $query->whereHas('customer',function($q) use ($searchQuery){
+                                $q->where('name','Like',$searchQuery);
+                            })->orWhere('installation_type', 'like', $searchQuery)->orWhere('loan_amount', 'like', $searchQuery);
+        }
+        $users = $query->paginate((int)$perPage);
+    return UserLoanResource::collection($users);
     }
 }

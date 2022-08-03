@@ -24,5 +24,11 @@ Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('ho
 
 Auth::routes();
 
+Route::get('email-test', function(){
+    $details['email'] = 'ashishkhinju123456789@gmail.com';
+    dispatch(new App\Jobs\SendEmailJob($details));
+    dd('done');
+    });
+
 
 
