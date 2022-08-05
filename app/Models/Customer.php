@@ -13,4 +13,8 @@ class Customer extends Model
     public function loans(){
         return $this->hasMany(Loan::class,'customer_id');
     }
+
+    public function customer_signatures(){
+        return $this->hasMany(CustomerSignature::class);
+    }
 }

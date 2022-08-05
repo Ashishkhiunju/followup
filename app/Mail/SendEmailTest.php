@@ -7,13 +7,15 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 class SendEmailTest extends Mailable
 {
 use Queueable, SerializesModels;
+private $detail;
 /**
 * Create a new message instance.
 *
 * @return void
 */
-public function __construct()
+public function __construct($detail)
 {
+    $this->detail = $detail;
 }
 /**
 * Build the message.
@@ -22,6 +24,7 @@ public function __construct()
 */
 public function build()
 {
-return $this->view('emails.test');
+$datas  = $this->detail;
+return $this->view('emails.test',compact('datas'));
 }
 }

@@ -13,7 +13,8 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+        Commands\InstallationLoanTodayCorn::class,
+        Commands\SendSmsCorn::class,
     ];
 
     /**
@@ -25,6 +26,10 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('inspire')->hourly();
+        $schedule->command('installationLoanToday:cron')
+        ->everyMinute();
+        $schedule->command('sendSms:cron')
+        ->everyMinute('16:33');
     }
 
     /**

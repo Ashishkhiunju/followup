@@ -34,6 +34,11 @@ Route::get('allusers',[UserController::class,'allusers']);
 // Route::get('loan',[LoanController::class,'index']);
 
 Route::middleware(['auth:sanctum'])->group(function(){
+    Route::get('runsedular', function () {
+
+        Artisan::call('installationLoanToday:cron');
+
+    });
     Route::get('authenticate',[AuthController::class,'isAuthenticate']);
     Route::get('dashboard-datas',[HomeController::class,'dashboardDatas']);
     Route::post('/logout',[AuthController::class,'logout']);
