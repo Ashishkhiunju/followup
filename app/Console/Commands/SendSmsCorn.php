@@ -2,9 +2,12 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Jobs\SendEmailJob;
 use App\Models\LoanInstallationDate;
+use App\Models\LoanSentReminder;
+
+
+use Illuminate\Console\Command;
 
 class SendSmsCorn extends Command
 {
@@ -40,11 +43,19 @@ class SendSmsCorn extends Command
     public function handle()
     {
         $todaydate = date('Y-m-d');
-        $dateafterWeek =  date("Y-m-d", strtotime('+7 days' , strtotime($todaydate)));
-        $datas = LoanInstallationDate::with('loan.customer')->whereBetween('next_installation_eng_date',[$todaydate,$dateafterWeek])->get();
-        // $emails = ['chandanee48@gmail.com', 'sunitabagale95@gmail.com', 'ashishkhinju123456789@gmail.com'];
-        foreach ($datas as $data) {
-            dispatch(new SendEmailJob($data->loan->customer->email,$data));
+        $dateafterWeek = date("Y-m-d", strtotime('+7 days', strtotime($todaydate)));
+        $datas = LoanInstallationDate::with('loan.customer')->whereBetween('next_installation_eng_date', [$todaydate, $dateafterWeek])->get();
+        $checkreminderAlreadySendForToday = LoanSentReminder::where('reminder_date', date('Y-m-d'))->where('reminder_type', 'email')->count();
+        if ($checkreminderAlreadySendForToday == 0) {
+
+            foreach ($datas as $data) {
+                LoanSentReminder::create([
+                    'loan_id'=>$data->loan_id,
+                    'reminder_date'=>date('Y-m-d'),
+                    'reminder_type'=>'email',
+                ]);
+                dispatch(new SendEmailJob($data->loan->customer->email, $data));
+            }
         }
     }
 }

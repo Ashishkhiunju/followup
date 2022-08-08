@@ -4,6 +4,8 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldQueue;
+
+
 class SendEmailTest extends Mailable
 {
 use Queueable, SerializesModels;
@@ -25,6 +27,7 @@ public function __construct($detail)
 public function build()
 {
 $datas  = $this->detail;
+
 return $this->view('emails.test',compact('datas'));
 }
 }

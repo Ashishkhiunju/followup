@@ -10,6 +10,7 @@ use App\Http\Controllers\SavingController;
 use App\Http\Controllers\IntrestController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\LoanTypeController;
+use App\Http\Controllers\ReminderController;
 use App\Http\Controllers\RecommenderController;
 use App\Http\Controllers\InstallationController;
 /*
@@ -81,5 +82,7 @@ Route::middleware(['auth:sanctum'])->group(function(){
     Route::resource('recommender',RecommenderController::class);
     Route::get('allrecommenders',[RecommenderController::class,'index']);
     Route::get('recommender-list',[RecommenderController::class,'list']);
+
+    Route::get('sent-reminders',[ReminderController::class,'index']);
 
 });

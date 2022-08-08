@@ -27,9 +27,9 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         $schedule->command('installationLoanToday:cron')
-        ->everyMinute();
+        ->daily();
         $schedule->command('sendSms:cron')
-        ->everyMinute('16:33');
+        ->daily();
     }
 
     /**

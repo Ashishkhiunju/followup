@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use App\Models\LoanContact;
 use App\Models\LoanInstallationDate;
+use App\Models\LoanSentReminder;
+
 
 
 /*
@@ -31,6 +33,11 @@ Auth::routes();
 
 
 Route::get('email-test', function () {
+    // LoanSentReminder::create([
+    //     'loan_id'=>1,
+    //     'reminder_date'=>date('Y-m-d'),
+    //     'reminder_type'=>'email',
+    // ]);
 
     $todaydate = date('Y-m-d');
     $dateafterWeek =  date("Y-m-d", strtotime('+7 days' , strtotime($todaydate)));
@@ -67,3 +74,12 @@ Route::get('installation-contact-today', function () {
     // }
 
 })->name('installationContactToday');
+
+
+Route::get('runsedular', function () {
+
+
+    Artisan::call('schedule:work');
+    Artisan::call('queue:work');
+
+});
