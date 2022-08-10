@@ -13,10 +13,13 @@ class Loan extends Model
         'customer_id',
         'loan_type',
         'loan_amount',
+        'total_loan_amount',
+        'emi',
         'paid_amount',
         'remaining_amount',
         'loan_duration',
         'loan_purpose',
+        'remaining_duration',
         'installation_type',
         'recommend_to',
         'issue_date_eng',
@@ -33,6 +36,11 @@ class Loan extends Model
     public function customer(){
         return $this->belongsTo(Customer::class);
     }
+
+    public function loan_installation_date(){
+        return $this->hasOne(LoanInstallationDate::class);
+    }
+
     public function user(){
         return $this->belongsTo(User::class);
     }

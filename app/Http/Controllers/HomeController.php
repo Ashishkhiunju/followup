@@ -21,7 +21,7 @@ class HomeController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth');
+        // $this->middleware('auth');
     }
 
     /**
@@ -71,4 +71,11 @@ class HomeController extends Controller
 
         return $data;
     }
+
+    public function pmtCalculation(Request $request){
+        return round(PMT($request->intrest_rate,$request->month,$request->principle),2);
+
+    }
+
+
 }

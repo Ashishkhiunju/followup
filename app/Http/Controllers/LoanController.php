@@ -27,7 +27,14 @@ class LoanController extends Controller
 
         // dd(date("Y-m-d"));
         // return new LoanCollection(Loan::with('customer')->get());
-        $loan = Loan::with('customer','loan_details')->where('user_id',Auth::user()->id);
+        $loan = Loan::with('customer','loan_details','loan_installation_date')->where('user_id',Auth::user()->id);
+        if($request->filter == 'week'){
+            $todaydate = date('Y-m-d');
+            $dateafterWeek = date("Y-m-d", strtotime('+7 days', strtotime($todaydate)));
+            $loan->whereHas('loan_installation_date',function($q) use($todaydate,$dateafterWeek){
+                $q->whereBetween('next_installation_eng_date',[$todaydate,$dateafterWeek]);
+            });
+        }
         if(strlen($request->search) > 1){
             $search = $request->search;
             $loan = $loan->whereHas('customer',function($q)use($search){
@@ -38,7 +45,12 @@ class LoanController extends Controller
             // $loan = $loan->where('loan_amount',"LIKE","%".$search."%");
 
         }
-        $filter = $request->filter;
+        if($request->filter == 'week'){
+            $filter = "DESC";
+        }else{
+            $filter = $request->filter;
+        }
+
 
         return $loan->orderBy('id',$filter)->paginate(10);
 
@@ -195,7 +207,10 @@ class LoanController extends Controller
             // $intrest_amount = $this->calculateIntrestAmount($request->loan_amount,$request->intrest_rate);
             $postarray = [
                 'customer_id'=>$customerid,
-                'remaining_amount'=>$request->loan_amount,
+                'remaining_amount'=>$request->emi * $request->loan_duration,
+                'remaining_duration'=>$request->loan_duration,
+                'total_loan_amount'=>$request->emi * $request->loan_duration,
+                'emi'=>$request->emi,
                 'issue_date_eng'=>$issue_date_eng,
                 'issue_date_nep'=>$request->issue_date,
                 'due_date_eng'=>$due_date_eng,
@@ -383,8 +398,8 @@ class LoanController extends Controller
     }
 
     public function saveloandetail(Request $request){
-        DB::beginTransaction();
-        try{
+        // DB::beginTransaction();
+        // try{
             LoanDetail::create([
                 'loan_id'=>$request->loan_id,
                 'paid_amount'=>$request->paid_amount,
@@ -393,7 +408,10 @@ class LoanController extends Controller
             $loan = Loan::find($request->loan_id);
             $loan->decrement('remaining_amount',$request->paid_amount);
             $loan->increment('paid_amount',$request->paid_amount);
+            $loan->decrement('remaining_duration',1);
 
+            $loan->emi = ($loan->remaining_duration > 1) ? PMT($loan->intrest_rate,$loan->remaining_duration,$loan->remaining_amount) : $loan->remaining_amount;
+            $loan->save();
             //update loan installation date
             $loaninstallationdate = LoanInstallationDate::where('loan_id',$request->loan_id)->first();
 
@@ -407,17 +425,17 @@ class LoanController extends Controller
                     'paid'=>'1',
                 ]);
             }
-            DB::commit();
+            // DB::commit();
             return response()->json([
                 'message'=>'Loan Installment Paid'
             ]);
-        }catch(\Exception $e){
-            DB::rollback();
-            $message = $e->getMessage();
-            return response()->json([
-                'message'=>$message
-            ]);
-        }
+        // }catch(\Exception $e){
+        //     DB::rollback();
+        //     $message = $e->getMessage();
+        //     return response()->json([
+        //         'message'=>$message
+        //     ]);
+        // }
 
     }
 

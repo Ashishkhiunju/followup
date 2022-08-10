@@ -18,10 +18,13 @@ class CreateLoansTable extends Migration
             $table->increments('id');
             $table->integer('customer_id');
             $table->integer('loan_type')->default(0);
-            $table->double('loan_amount')->default(0);
-            $table->double('paid_amount')->default(0);
-            $table->double('remaining_amount')->default(0);
+            $table->double('loan_amount',10,2)->default(0);
+            $table->double('total_loan_amount',10,2)->default(0);
+            $table->double('emi',10,2)->default(0);
+            $table->double('paid_amount',10,2)->default(0);
+            $table->double('remaining_amount',10,2)->default(0);
             $table->string('loan_duration')->default(0);
+            $table->double('remaining_duration')->default(0);
             $table->string('loan_purpose')->nullable();
             $table->string('installation_type')->nullable();
             $table->string('recommend_to')->nullable();
@@ -31,7 +34,7 @@ class CreateLoansTable extends Migration
             $table->string('due_date_nep')->nullable();
             $table->integer('user_id')->nullable();
             $table->float('intrest_rate')->default(0);
-            $table->double('intrest_amount')->default(0);
+            $table->double('intrest_amount',10,2)->default(0);
             $table->integer('recommender_id')->nullable();
 
             $table->timestamps();

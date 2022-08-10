@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Models\LoanContact;
 use App\Models\LoanInstallationDate;
 use App\Models\LoanSentReminder;
+use App\Http\Controllers\HomeController;
 
 
 
@@ -83,3 +84,5 @@ Route::get('runsedular', function () {
     Artisan::call('queue:work');
 
 });
+
+Route::get('pmt',[HomeController::class,'pmtCalculation']);
