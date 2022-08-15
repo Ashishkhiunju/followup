@@ -7,6 +7,7 @@ use App\Models\LoanContact;
 use App\Models\LoanInstallationDate;
 use App\Models\LoanSentReminder;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\TwiloController;
 
 
 
@@ -86,3 +87,5 @@ Route::get('runsedular', function () {
 });
 
 Route::get('pmt',[HomeController::class,'pmtCalculation']);
+
+Route::get('smsTwilo',[TwiloController::class,'notify']);

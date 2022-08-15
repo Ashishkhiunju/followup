@@ -16,6 +16,8 @@ class CreateLoanTypesTable extends Migration
         Schema::create('loan_types', function (Blueprint $table) {
             $table->increments('id');
             $table->string('type')->nullable();
+            $table->string('based')->nullable();
+            $table->double('intrest_rate')->default(0);
             $table->timestamps();
         });
     }

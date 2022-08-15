@@ -8,5 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class LoanType extends Model
 {
     use HasFactory;
-    protected $fillable = ['type'];
+    protected $fillable = ['type','based','intrest_rate'];
 }

@@ -20,7 +20,9 @@ class LoanTypeController extends Controller
             ]);
         }
         LoanType::create([
-            'type'=>$request->title
+            'type'=>$request->title,
+            'based'=>$request->based,
+            'intrest_rate'=>$request->intrest_rate,
         ]);
         return response()->json([
             'message'=>'Loan type created successfully'

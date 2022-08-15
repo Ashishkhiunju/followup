@@ -29,7 +29,8 @@ class Loan extends Model
         'user_id',
         'intrest_rate',
         'intrest_amount',
-        'recommender_id'
+        'recommender_id',
+        'status'
         ];
 
 

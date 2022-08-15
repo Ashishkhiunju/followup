@@ -73,7 +73,22 @@ class HomeController extends Controller
     }
 
     public function pmtCalculation(Request $request){
-        return round(PMT($request->intrest_rate,$request->month,$request->principle),2);
+        $installation_type = $request->installation_type;
+        $emiInMonth = PMT($request->intrest_rate,$request->month,$request->principle);
+        if($installation_type == 'daily'){
+            $emi = $emiInMonth/30;
+        }
+        if($installation_type == 'weekly'){
+            $emi = $emiInMonth/4;
+        }
+        if($installation_type == 'monthly'){
+            $emi = $emiInMonth;
+        }
+        if($installation_type == 'yearly'){
+            $emi = $emiInMonth * 12;
+        }
+
+        return round($emi,2);
 
     }
 

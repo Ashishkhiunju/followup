@@ -17,7 +17,8 @@
         "laravel/sanctum": "^2.15",
         "laravel/tinker": "^2.0",
         "laravel/ui": "^3.4",
-        "shankhadev/bsdate": "master-dev"
+        "shankhadev/bsdate": "master-dev",
+        "twilio/sdk": "^6.40"
     },
     "require-dev": {
         "facade/ignition": "^2.3.6",
@@ -41,6 +42,7 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
+
         },
         "files":[
             "app/Helper/helpers.php"
